@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Time Progress</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Time">
+    <link rel="apple-touch-icon" href="https://img.icons8.com/dusk/64/000000/clock--v1.png">
+
+    <style>
+        body {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            text-align: center;
+            font-weight: 200;
+            margin-bottom: 40px;
+            font-size: 24px;
+            opacity: 0.7;
+        }
+
+        .card {
+            background: #1c1c1e;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .label-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #8e8e93;
+        }
+
+        .percent {
+            color: #fff;
+        }
+
+        .progress-bg {
+            background-color: #3a3a3c;
+            height: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #0a84ff;
+            width: 0%;
+            border-radius: 6px;
+            transition: width 0.5s ease;
+        }
+
+        /* Разные цвета для разных шкал */
+        .fill-minute { background-color: #30d158; } /* Зеленый */
+        .fill-hour { background-color: #0a84ff; }   /* Синий */
+        .fill-day { background-color: #5e5ce6; }    /* Фиолетовый */
+        .fill-year { background-color: #bf5af2; }   /* Розовый */
+
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #555;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Мое Время</h1>
+
+    <div class="card">
+        <div class="label-row">
+            <span>Минута</span>
+            <span class="percent" id="min-val">0%</span>
+        </div>
+        <div class="progress-bg">
+            <div class="progress-fill fill-minute" id="min-bar"></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="label-row">
+            <span>Час</span>
+            <span class="percent" id="hour-val">0%</span>
+        </div>
+        <div class="progress-bg">
+            <div class="progress-fill fill-hour" id="hour-bar"></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="label-row">
+            <span>День</span>
+            <span class="percent" id="day-val">0%</span>
+        </div>
+        <div class="progress-bg">
+            <div class="progress-fill fill-day" id="day-bar"></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="label-row">
+            <span>Год</span>
+            <span class="percent" id="year-val">0%</span>
+        </div>
+        <div class="progress-bg">
+            <div class="progress-fill fill-year" id="year-bar"></div>
+        </div>
+    </div>
+
+    <div class="footer">Обновляется каждую секунду</div>
+
+    <script>
+        function updateProgress() {
+            const now = new Date();
+
+            // 1. Прогресс минуты
+            const seconds = now.getSeconds();
+            const percentMin = (seconds / 60) * 100;
+            updateBar('min', percentMin);
+
+            // 2. Прогресс часа
+            const minutes = now.getMinutes();
+            const percentHour = ((minutes * 60 + seconds) / 3600) * 100;
+            updateBar('hour', percentHour);
+
+            // 3. Прогресс дня
+            const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const msInDay = 24 * 60 * 60 * 1000;
+            const diffDay = now - startOfDay;
+            const percentDay = (diffDay / msInDay) * 100;
+            updateBar('day', percentDay);
+
+            // 4. Прогресс года
+            const startOfYear = new Date(now.getFullYear(), 0, 1);
+            const startOfNextYear = new Date(now.getFullYear() + 1, 0, 1);
+            const totalMsYear = startOfNextYear - startOfYear;
+            const diffYear = now - startOfYear;
+            const percentYear = (diffYear / totalMsYear) * 100;
+            updateBar('year', percentYear);
+        }
+
+        function updateBar(id, value) {
+            const percentStr = value.toFixed(1) + '%';
+            document.getElementById(id + '-bar').style.width = percentStr;
+            document.getElementById(id + '-val').innerText = percentStr;
+        }
+
+        // Запускаем сразу и потом каждую секунду
+        updateProgress();
+        setInterval(updateProgress, 1000);
+    </script>
+</body>
+</html>
